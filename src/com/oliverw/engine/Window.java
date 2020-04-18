@@ -1,9 +1,13 @@
 package com.oliverw.engine;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Canvas;
+import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
+
+import javax.swing.JFrame;
 
 public class Window
 {
@@ -27,8 +31,9 @@ public class Window
         frame.add(canvas, BorderLayout.CENTER);
         frame.pack();
         frame.setLocationRelativeTo(null);
-        frame.setResizable(false);
         frame.setVisible(true);
+        frame.setResizable(false);
+        
         
         canvas.createBufferStrategy(2);
         bs = canvas.getBufferStrategy();
@@ -39,4 +44,16 @@ public class Window
         g.drawImage(image, 0, 0, canvas.getWidth(), canvas.getHeight(), null);
         bs.show();
     }
+
+	public BufferedImage getImage() {
+		return image;
+	}
+
+	public Canvas getCanvas() {
+		return canvas;
+	}
+
+	public JFrame getFrame() {
+		return frame;
+	}
 }
