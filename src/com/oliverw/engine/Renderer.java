@@ -1,37 +1,64 @@
 package com.oliverw.engine;
 
 import java.awt.image.DataBufferInt;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 import com.oliverw.engine.gfx.Font;
 import com.oliverw.engine.gfx.Image;
 import com.oliverw.engine.gfx.ImageTile;
+import com.oliverw.engine.gfx.RenderLayer;
 
-public class Renderer {
-
+public class Renderer
+{
+	private Font font = Font.STANDARD;
+	
 	private int pW, pH;
 	private int[] p;
 	
-	private Font font = Font.STANDARD;
+	private int[] zBuffer;
+	private int zDepth = 0;
 	
 	public Renderer(GameContainer gc) {
 		pW = gc.getWidth();
 		pH = gc.getHeight();
 		
 		p = ((DataBufferInt)gc.getWindow().getImage().getRaster().getDataBuffer()).getData();
+		
+		zBuffer = new int[p.length];
 	}
 	
 	public void clear() {
 		for (int i = 0; i < p.length; i++) {
 			p[i] = 0;
+			
+			zBuffer[i] = 0;
 		}
 	}
 	
 	public void setPixel(int x, int y, int value) {
-		if ((x < 0 || x >= pW || y < 0 || y >= pH) || ((value >> 24) & 0xff) == 0) {
+		int alpha = (value >> 24) & 0xff;
+		
+		if ((x < 0 || x >= pW || y < 0 || y >= pH) || alpha == 0) {
 			return;
 		}
 		
-		p[x + y * pW] = value;
+		if (zBuffer[x + y * pW] > zDepth) {
+			return;
+		}
+		
+		if (alpha == 255) {
+			p[x + y * pW] = value;
+		} else {
+			int pixelColour = p[x + y * pW];
+			int newRed = ((pixelColour >> 16) & 0xff) - (int)((((pixelColour >> 16) & 0xff) - (value >> 16) & 0xff) * (alpha / 255f));
+			int newGreen = ((pixelColour >> 8) & 0xff) - (int)((((pixelColour >> 8) & 0xff) - (value >> 8) & 0xff) * (alpha / 255f));
+			int newBlue = ((pixelColour) & 0xff) - (int)((((pixelColour) & 0xff) - (value & 0xff)) * (alpha / 255f));
+			
+			
+			p[x + y * pW] = (255 << 24 | newRed << 16 | newGreen << 8 | newBlue);
+		}
 	}
 	
 	public void drawText(String text, int offX, int offY, int colour) {

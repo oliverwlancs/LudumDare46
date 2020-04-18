@@ -10,7 +10,7 @@ public class GameContainer implements Runnable
 
     private boolean running = false;
     private final double UPDATE_CAP = 1.0/60.0;
-    private int width = 320, height = 240;
+    private int width = 260, height = 340;
     private float scale = 2f;
     private String title = "Engine";
 
@@ -45,7 +45,7 @@ public class GameContainer implements Runnable
         int fps = 0;
 
         while (running) {
-            render = false;
+            render = true;
 
             firstTime = System.nanoTime() / 1000000000.0;
             passedTime = firstTime - lastTime;
@@ -130,5 +130,9 @@ public class GameContainer implements Runnable
 
 	public Input getInput() {
 		return input;
+	}
+
+	public Renderer getRenderer() {
+		return renderer;
 	}
 }

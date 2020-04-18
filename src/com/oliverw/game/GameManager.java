@@ -1,49 +1,67 @@
 package com.oliverw.game;
 
-import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 import com.oliverw.engine.AbstractGame;
+import com.oliverw.engine.Camera;
 import com.oliverw.engine.GameContainer;
 import com.oliverw.engine.Renderer;
 import com.oliverw.engine.gfx.Image;
-import com.oliverw.engine.gfx.ImageTile;
-import com.oliverw.engine.sfx.SoundClip;
+import com.oliverw.engine.gfx.RenderLayer;
 
 public class GameManager extends AbstractGame
 {
-	private Image image;
-	private ImageTile tiledImage;
-	private SoundClip clip;
+	private ArrayList<RenderLayer> renderLayers;
+	
+	private Camera camera;
+	
+	private PlayerController player;
 	
 	public GameManager() {
-		image = new Image("/apple.png");
-		tiledImage = new ImageTile("/tiles.png", 16, 16);
-		clip = new SoundClip("/untitled.wav");
+		camera = new Camera();
+		
+		renderLayers = new ArrayList<RenderLayer>();
+		
+		player = new PlayerController();
 	}
 	
 	@Override
 	public void update(GameContainer gc, float dt) {
-		if (gc.getInput().isKeyDown(KeyEvent.VK_A)) {
-			clip.play();
-		}
+		
 	}
 
 	@Override
 	public void render(GameContainer gc, Renderer r) {
-//		r.drawImageTile(image, gc.getInput().getMouseX(), gc.getInput().getMouseY(), 0, 0);
-		int startX = 30;
-		int startY = 30;
-		int offset = 4;
-		for (int y = 0; y < 3; y++) {
-			for (int x = 0; x < 3; x++) {
-				r.drawImageTile(tiledImage, startX + x * (offset + tiledImage.getTileWidth()), startY + y * (offset + tiledImage.getTileHeight()), x, y);
+		for (RenderLayer rL : renderLayers) {
+			for (Image image : rL.getImages()) {
+				r.drawImage(image, (int)image.getParent().getxPos(), (int)image.getParent().getyPos());
+			}
+		}
+	}
+	
+	public void addRenderLayer(RenderLayer rL) {
+		renderLayers.add(rL);
+		sortRenderLayers();
+	}
+	
+	public void sortRenderLayers() {
+		boolean sorted = true;
+		for (int i = 1; i < renderLayers.size(); i++) {
+			if (renderLayers.get(i).getzIndex() < renderLayers.get(i - 1).getzIndex()) {
+				sorted = false;
 			}
 		}
 		
-		r.drawImage(image, gc.getInput().getMouseX() - 16, gc.getInput().getMouseY() - 16);
+		if (sorted) {return;}
 		
-		r.drawText("Test", 90, 90, 0xffa85c0c);
-		r.drawRect(100, 40, 50, 30, 0xffff0000, 0xff00ff00);
+		Collections.sort(renderLayers, new Comparator<RenderLayer>() {
+		    @Override
+		    public int compare(RenderLayer o1, RenderLayer o2) {
+		    	return Integer.compare(o1.getzIndex(), o2.getzIndex());
+		    }
+		});
 	}
 
 	public static void main(String[] args) {
