@@ -7,10 +7,13 @@ public class GameContainer implements Runnable
     private Renderer renderer;
     private Input input;
     private AbstractGame game;
+    
+    public static final int SCREEN_WIDTH = 256;
+    public static final int SCREEN_HEIGHT = 336;
 
     private boolean running = false;
     private final double UPDATE_CAP = 1.0/60.0;
-    private int width = 260, height = 340;
+    private int width = SCREEN_WIDTH, height = SCREEN_HEIGHT;
     private float scale = 2f;
     private String title = "Engine";
 
@@ -43,6 +46,8 @@ public class GameContainer implements Runnable
         double frameTime = 0;
         int frames = 0;
         int fps = 0;
+        
+        game.init(this);
 
         while (running) {
             render = true;

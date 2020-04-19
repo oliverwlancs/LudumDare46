@@ -5,8 +5,6 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-import com.oliverw.engine.Transform;
-
 public class Image
 {
 	private int width;
@@ -14,7 +12,9 @@ public class Image
 	
 	private int[] p;
 	
-	private Transform parent;
+	public Image() {
+		
+	}
 	
 	public Image(int[] p, int width, int height) {
 		this.p = p;
@@ -23,12 +23,7 @@ public class Image
 	}
 	
 	public Image(String path) {
-		this(path, null);
-	}
-	
-	public Image(String path, Transform parent) {
 		BufferedImage image = null;
-		this.parent = parent;
 		
 		try {
 			image = ImageIO.read(Image.class.getResourceAsStream(path));
@@ -42,6 +37,16 @@ public class Image
 		p = image.getRGB(0, 0, width, height, null, 0, width);
 		
 		image.flush();
+	}
+	
+	public void setImage(int[] p, int width, int height) {
+		this.p = p;
+		this.width = width;
+		this.height = height;
+	}
+	
+	public void setImage(Image image) {
+		setImage(image.getP(), image.getWidth(), image.getHeight());
 	}
 
 	public int getWidth() {
@@ -67,13 +72,4 @@ public class Image
 	public void setP(int[] p) {
 		this.p = p;
 	}
-
-	public Transform getParent() {
-		return parent;
-	}
-
-	public void setParent(Transform parent) {
-		this.parent = parent;
-	}
-
 }
